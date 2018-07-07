@@ -18,7 +18,7 @@ expression by using the -r flag.
 fi
 
 # VirusTotal
-curl -s "https://www.virustotal.com/vtapi/v2/domain/report?domain=hackerone.com&apikey=${VIRUS_TOTAL_API_KEY}" | 
+curl -s "https://www.virustotal.com/vtapi/v2/domain/report?domain=$1&apikey=${VIRUS_TOTAL_API_KEY}" | 
 jq -r .undetected_urls[] | 
 grep -Eo "(http|https)://*$1[\da-z./?A-Z0-9\D=_-]*" > curate.txt
 
