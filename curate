@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+if [[ $1 == "" ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]]; then
+	echo """To fetch archived URLs simply run curate and specify the
+target host.
+
+  $ curate <host>
+  $ curate example.com
+
+If you want to search for strings straight away in the 
+output you can also specify your search term or regular
+expression by using the -r flag.
+
+  $ curate <host> -r <search term>
+  $ curate example.com -r example
+	"""
+	exit 1
+fi
+
+# VirusTotal
+curl -s "https://www.virustotal.com/vtapi/v2/domain/report?domain=hackerone.com&apikey=${VIRUS_TOTAL_API_KEY}" | 
+jq -r .undetected_urls[] | 
+grep -Eo "(http|https)://*$1[\da-z./?A-Z0-9\D=_-]*" > curate.txt
+
+# Common Crawl
+curl -s "http://http://index.commoncrawl.org/CC-MAIN-2018-22-index?url=*.$1&output=json" | 
+jq -r .url >> curate.txt
+
+# Wayback Machine
+curl -s "https://web.archive.org/cdx/search/cdx?url=*.$1&output=json&collapse=urlkey" | 
+jq -r .[] | 
+grep -Eo "(http|https)://.*\.$1[\da-z./?A-Z0-9\D=_-]*" >> curate.txt
+
+# Users can supply search terms and regular expressions
+# to search through the output
+if [[ $2 == "-r" ]]; then
+	sort -u curate.txt | grep --color "$3"
+else
+	sort -u curate.txt
+fi
