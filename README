@@ -58,7 +58,7 @@ List of search terms
   - id=
 
   It is advisable to exclude images and stylesheets from your 
-  searches by pipping everything into 'grep -v'.
+  searches by piping everything into 'grep -v'.
 
 Contributing
 
